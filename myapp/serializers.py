@@ -82,3 +82,10 @@ class ChanalSerializer(serializers.ModelSerializer):
         model = Chanal
         fields = ['id','owner','title','description','type','cr_at','link',]
         read_only_fields = ['id', 'owner', 'cr_at']
+        
+        
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = '__all__'
+        read_only_fields = ['chanal_id', 'cr_at']
