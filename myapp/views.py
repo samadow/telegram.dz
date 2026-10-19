@@ -330,3 +330,58 @@ class ChanalListCreateView(generics.ListCreateAPIView):
 class ChanalDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Chanal.objects.all()
     serializer_class = ChanalSerializer
+    
+    
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
+from .models import Post, Chanal
+from .serializers import PostSerializer
+
+
+# GET ва POST — рӯйхати постҳо ва сохтани пост
+class PostListCreateView(generics.ListCreateAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Post.objects.filter(
+            chanal_id_id=self.kwargs['channel_id']
+        ).order_by('-cr_at')
+
+    def perform_create(self, serializer):
+        channel = Chanal.objects.get(
+            id=self.kwargs['channel_id']
+        )
+
+        if channel.owner != self.request.user:
+            raise PermissionDenied(
+                'Танҳо соҳиби канал метавонад пост созад.'
+            )
+
+        serializer.save(chanal_id=channel)
+
+
+# GET, PATCH ва DELETE — як пост
+class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_update(self, serializer):
+        post = self.get_object()
+
+        if post.chanal_id.owner != self.request.user:
+            raise PermissionDenied(
+                'Танҳо соҳиби канал метавонад постро тағйир диҳад.'
+            )
+
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if instance.chanal_id.owner != self.request.user:
+            raise PermissionDenied(
+                'Танҳо соҳиби канал метавонад постро нест кунад.'
+            )
+
+        instance.delete()
