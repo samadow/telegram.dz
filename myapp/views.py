@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
 # from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import RegisterSerializer,ProfileSerializer,AvatarSerialezer,ChatSerializer,MessageSerializer,GroupSerializer,GroupNumberRoleSerializer,GroupNumberSerializer,GroupMessageSerializer
+from .serializers import RegisterSerializer,ProfileSerializer,AvatarSerialezer,ChatSerializer,MessageSerializer,GroupSerializer,GroupNumberRoleSerializer,GroupNumberSerializer,GroupMessageSerializer,ChanalSerializer
 from rest_framework.generics import CreateAPIView,RetrieveAPIView,UpdateAPIView,ListAPIView,DestroyAPIView
 from .models import * 
 from rest_framework.exceptions import ValidationError,PermissionDenied
@@ -322,33 +322,11 @@ class ChannelListCreateView(generics.ListCreateAPIView):
         serializer.save(owner=self.request.user)
 
 
-class ChannelDetailView(generics.RetrieveUpdateDestroyAPIView):
+class ChanalListCreateView(generics.ListCreateAPIView):
+    queryset = Chanal.objects.all()
     serializer_class = ChanalSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        user = self.request.user
 
-        return Chanal.objects.filter(
-            Q(type='public')
-            | Q(owner=user)
-            | Q(type='private', flowing__user_id=user)
-        ).distinct()
-
-    def perform_update(self, serializer):
-        channel = self.get_object()
-
-        if channel.owner != self.request.user:
-            raise PermissionDenied(
-                'Танҳо соҳиби канал метавонад онро тағйир диҳад.'
-            )
-
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        if instance.owner != self.request.user:
-            raise PermissionDenied(
-                'Танҳо соҳиби канал метавонад онро нест кунад.'
-            )
-
-        instance.delete()
+class ChanalDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Chanal.objects.all()
+    serializer_class = ChanalSerializer
