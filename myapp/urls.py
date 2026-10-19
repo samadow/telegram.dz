@@ -11,6 +11,7 @@ from .views import (RegisterView,Profil_viws,
                     GroupMessageListCreateView,
                     GroupMessageDeleteView,
                     ChanalListCreateView,ChanalDetailView,
+                    PostListCreateView,
                     Group_delet,Group_update,Group_detail
                     )
 
@@ -43,16 +44,8 @@ urlpatterns = [
     path('group-messages/<int:pk>/',GroupMessageDeleteView.as_view(),name='group-message-delete'),
     path('channels/', ChanalListCreateView.as_view()),
     path('channels/<int:pk>/', ChanalDetailView.as_view()),
-    path(
-        'channels/<int:channel_id>/posts/',
-        PostListCreateView.as_view(),
-        name='post-list-create'
-    ),
-    path(
-        'posts/<int:pk>/',
-        PostDetailView.as_view(),
-        name='post-detail'
-    ),
+    path('channels/<int:channel_id>/posts/',PostListCreateView.as_view(),name='post-list-create'),
+    path('posts/<int:pk>/',PostDetailView.as_view(),name='post-detail'),
     
 ]
 
