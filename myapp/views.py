@@ -390,4 +390,13 @@ class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
         
 # kjvnrwngwiojgwsopjvsweogjpjrg
 # kjvnrwngwiojgwsopjvsweogjpjrg
+# kjvnrwngwiojgwsopjvsweogjpjrg        
+# kjvnrwngwiojgwsopjvsweogjpjrg
+# kjvnrwngwiojgwsopjvsweogjpjrg
+# kjvnrwngwiojgwsopjvsweogjpjrg        
+# kjvnrwngwiojgwsopjvsweogjpjrg
+# kjvnrwngwiojgwsopjvsweogjpjrg
+# kjvnrwngwiojgwsopjvsweogjpjrg        
+# kjvnrwngwiojgwsopjvsweogjpjrg
+# kjvnrwngwiojgwsopjvsweogjpjrg
 # kjvnrwngwiojgwsopjvsweogjpjrg
