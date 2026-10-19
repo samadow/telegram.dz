@@ -4,10 +4,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
 # from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import RegisterSerializer,ProfileSerializer,AvatarSerialezer,ChatSerializer,MessageSerializer,GroupSerializer
+from .serializers import RegisterSerializer,ProfileSerializer,AvatarSerialezer,ChatSerializer,MessageSerializer,GroupSerializer,GroupNumberRoleSerializer,GroupNumberSerializer
 from rest_framework.generics import CreateAPIView,RetrieveAPIView,UpdateAPIView,ListAPIView,DestroyAPIView
 from .models import * 
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError,PermissionDenied
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions
 from rest_framework.pagination import PageNumberPagination
@@ -154,4 +154,94 @@ class Group_delet(DestroyAPIView):
 class Group_update(UpdateAPIView):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+    
+class GroupNumberListCreateView(generics.ListCreateAPIView):
+    serializer_class = GroupNumberSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_group(self):
+        return get_object_or_404(Group, id=self.kwargs['group_id'])
+
+    def get_queryset(self):
+        group = self.get_group()
+
+        is_member = Group_number.objects.filter(
+            group=group,
+            user=self.request.user
+        ).exists()
+
+        if group.owner_id != self.request.user.id and not is_member:
+            raise PermissionDenied('Ту иштирокчии ин гурӯҳ нестӣ.')
+
+        return Group_number.objects.filter(group=group).select_related('user')
+
+    def perform_create(self, serializer):
+        group = self.get_group()
+        user = self.request.user
+
+        is_admin = Group_number.objects.filter(
+            group=group,
+            user=user,
+            role='admin'
+        ).exists()
+
+        if group.owner_id != user.id and not is_admin:
+            raise PermissionDenied(
+                'Танҳо соҳиби гурӯҳ ё администратор иштирокчӣ илова мекунад.'
+            )
+
+        new_user = serializer.validated_data['user']
+
+        if Group_number.objects.filter(
+            group=group,
+            user=new_user
+        ).exists():
+            raise ValidationError('Ин корбар аллакай иштирокчии гурӯҳ аст.')
+
+        serializer.save(group=group, role='member')
+
+
+class GroupNumberRoleUpdateView(generics.UpdateAPIView):
+    serializer_class = GroupNumberRoleSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['patch', 'head', 'options']
+    lookup_url_kwarg = 'member_id'
+
+    def get_queryset(self):
+        group = get_object_or_404(Group, id=self.kwargs['group_id'])
+
+        if group.owner_id != self.request.user.id:
+            raise PermissionDenied('Танҳо соҳиби гурӯҳ метавонад рольро иваз кунад.')
+
+        return Group_number.objects.filter(group=group)
+
+    def get_object(self):
+        member = super().get_object()
+
+        if member.user_id == member.group.owner_id:
+            raise ValidationError('Роли соҳиби гурӯҳро тағйир додан мумкин нест.')
+
+        return member
+
+
+class GroupNumberLeaveView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, group_id):
+        group = get_object_or_404(Group, id=group_id)
+
+        if group.owner_id == request.user.id:
+            raise ValidationError(
+                'Соҳиби гурӯҳ баромада наметавонад. Аввал соҳибиро супоред.'
+            )
+
+        member = get_object_or_404(
+            Group_number,
+            group=group,
+            user=request.user
+        )
+
+        member.delete()
+
+        return Response({'detail': 'Ту аз гурӯҳ баромадӣ.'})
     

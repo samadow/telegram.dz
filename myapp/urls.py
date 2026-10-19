@@ -4,7 +4,8 @@ from .views import (RegisterView,Profil_viws,
                     ProfileSearchView,Avatar_cr,
                     Avatar_delet,ChatListCreateView,
                     ChatDetailDeleteView,MessageDeleteView,
-                    MessageListCreateView
+                    MessageListCreateView,Group_cr,
+                    Group_delet,Group_update,Group_detail
                     )
 
 
@@ -28,6 +29,8 @@ urlpatterns = [
     path('chats/<int:pk>/', ChatDetailDeleteView.as_view(), name='chat-detail'),
     path('chats/<int:chat_id>/messages/',MessageListCreateView.as_view(),name='message-list-create'),
     path('messages/<int:pk>/',MessageDeleteView.as_view(),name='message-delete'),
+    path('group_cr',Group_cr.as_view()
+    )
     
 
     

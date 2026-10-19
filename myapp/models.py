@@ -17,12 +17,6 @@ class Avatar(models.Model):
     profile = models.CharField(max_length=50)
     image = models.FileField( max_length=100)
     
-    
-class Group_number(models.Model):
-    user = models.ForeignKey(Acounts, on_delete=models.CASCADE)
-    role = models.CharField(max_length=50)
-    joing_data = models.DateField(auto_now_add=True)
-    
 class Chanal(models.Model):
     owner = models.ForeignKey(Acounts, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
@@ -68,4 +62,18 @@ class Group_message(models.Model):
     content = models.CharField(max_length=50)
     cr_at = models.DateField(auto_now=False, auto_now_add=False)
     
-    
+
+class Group_number(models.Model):
+        ROLE_CHOICES = [
+        ('owner', 'Owner'),
+        ('admin', 'Admin'),
+        ('member', 'Member'),
+    ]
+
+        user = models.ForeignKey(Acounts,on_delete=models.CASCADE,related_name='group_memberships')
+        group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='members')
+        role = models.CharField( max_length=10, choices=ROLE_CHOICES, default='member')
+        joing_data = models.DateTimeField(auto_now_add=True)
+
+        class Meta:
+            constraints = [models.UniqueConstraint(fields=['user', 'group'],name='unique_user_group')]

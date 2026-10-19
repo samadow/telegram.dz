@@ -49,3 +49,19 @@ class GroupSerializer(serializers.ModelSerializer):
     model = Group
     fields = "__all__"
     
+class GroupNumberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group_number
+        fields = ['id', 'user', 'group', 'role', 'joing_data']
+        read_only_fields = ['id', 'group', 'role', 'joing_data']
+
+
+class GroupNumberRoleSerializer(serializers.ModelSerializer):
+    role = serializers.ChoiceField(choices=[
+        ('member', 'Member'),
+        ('admin', 'Admin'),
+    ])
+
+    class Meta:
+        model = Group_number
+        fields = ['role']
