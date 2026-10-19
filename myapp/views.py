@@ -385,3 +385,6 @@ class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
             )
 
         instance.delete()
+        
+        
+        
