@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
 # from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import RegisterSerializer,ProfileSerializer,AvatarSerialezer,ChatSerializer,MessageSerializer,GroupSerializer,GroupNumberRoleSerializer,GroupNumberSerializer
+from .serializers import RegisterSerializer,ProfileSerializer,AvatarSerialezer,ChatSerializer,MessageSerializer,GroupSerializer,GroupNumberRoleSerializer,GroupNumberSerializer,GroupMessageSerializer
 from rest_framework.generics import CreateAPIView,RetrieveAPIView,UpdateAPIView,ListAPIView,DestroyAPIView
 from .models import * 
 from rest_framework.exceptions import ValidationError,PermissionDenied
@@ -244,4 +244,61 @@ class GroupNumberLeaveView(generics.GenericAPIView):
         member.delete()
 
         return Response({'detail': 'Ту аз гурӯҳ баромадӣ.'})
+    
+    
+class GroupMessagePagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
+class GroupMessageListCreateView(generics.ListCreateAPIView):
+    serializer_class = GroupMessageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = GroupMessagePagination
+
+    def get_group(self):
+        group = get_object_or_404(
+            Group,
+            id=self.kwargs['group_id']
+        )
+
+        user = self.request.user
+
+        is_member = Group_number.objects.filter(
+            group=group,
+            user=user
+        ).exists()
+
+        if group.owner_id != user.id and not is_member:
+            raise PermissionDenied(
+                'Ту иштирокчии ин гурӯҳ нестӣ.'
+            )
+
+        return group
+
+    def get_queryset(self):
+        group = self.get_group()
+
+        return Group_message.objects.filter(
+            group=group
+        ).select_related('user').order_by('cr_at', 'id')
+
+    def perform_create(self, serializer):
+        group = self.get_group()
+
+        serializer.save(
+            user=self.request.user,
+            group=group
+        )
+
+
+class GroupMessageDeleteView(generics.DestroyAPIView):
+    serializer_class = GroupMessageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Group_message.objects.filter(
+            user=self.request.user
+        )
     

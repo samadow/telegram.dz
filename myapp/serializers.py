@@ -65,3 +65,9 @@ class GroupNumberRoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group_number
         fields = ['role']
+        
+class GroupMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group_message
+        fields = ['id', 'user', 'group', 'content', 'cr_at']
+        read_only_fields = ['id', 'user', 'group', 'cr_at']
