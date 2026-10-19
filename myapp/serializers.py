@@ -71,3 +71,14 @@ class GroupMessageSerializer(serializers.ModelSerializer):
         model = Group_message
         fields = ['id', 'user', 'group', 'content', 'cr_at']
         read_only_fields = ['id', 'user', 'group', 'cr_at']
+        
+        
+from rest_framework import serializers
+from .models import Chanal
+
+
+class ChanalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chanal
+        fields = ['id','owner','title','description','type','cr_at','link',]
+        read_only_fields = ['id', 'owner', 'cr_at']

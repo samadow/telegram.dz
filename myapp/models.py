@@ -22,7 +22,7 @@ class Chanal(models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=50)
     type = models.CharField(max_length=50)
-    cr_at = models.DateField( auto_now=False, auto_now_add=False)
+    cr_at = models.DateField(auto_now_add=True)
     link = models.CharField(max_length=50)
     
 

@@ -302,3 +302,53 @@ class GroupMessageDeleteView(generics.DestroyAPIView):
             user=self.request.user
         )
     
+    
+
+
+class ChannelListCreateView(generics.ListCreateAPIView):
+    serializer_class = ChanalSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        return Chanal.objects.filter(
+            Q(type='public')
+            | Q(owner=user)
+            | Q(type='private', flowing__user_id=user)
+        ).distinct()
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class ChannelDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ChanalSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        return Chanal.objects.filter(
+            Q(type='public')
+            | Q(owner=user)
+            | Q(type='private', flowing__user_id=user)
+        ).distinct()
+
+    def perform_update(self, serializer):
+        channel = self.get_object()
+
+        if channel.owner != self.request.user:
+            raise PermissionDenied(
+                'Танҳо соҳиби канал метавонад онро тағйир диҳад.'
+            )
+
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if instance.owner != self.request.user:
+            raise PermissionDenied(
+                'Танҳо соҳиби канал метавонад онро нест кунад.'
+            )
+
+        instance.delete()
