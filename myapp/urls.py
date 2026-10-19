@@ -48,6 +48,7 @@ urlpatterns = [
     path('posts/<int:pk>/',PostDetailView.as_view(),name='post-detail'),
     path('groups/<int:pk>/', Group_detail.as_view(), name='group-detail'),
     path('groups/<int:pk>/update/', Group_update.as_view(), name='group-update'),
+    path('groups/<int:pk>/delete/', Group_delet.as_view(), name='group-delete'),
     
 ]
 
