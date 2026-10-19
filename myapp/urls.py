@@ -5,6 +5,9 @@ from .views import (RegisterView,Profil_viws,
                     Avatar_delet,ChatListCreateView,
                     ChatDetailDeleteView,MessageDeleteView,
                     MessageListCreateView,Group_cr,
+                    GroupNumberListCreateView,
+                    GroupNumberRoleUpdateView,
+                    GroupNumberLeaveView,
                     Group_delet,Group_update,Group_detail
                     )
 
@@ -29,10 +32,11 @@ urlpatterns = [
     path('chats/<int:pk>/', ChatDetailDeleteView.as_view(), name='chat-detail'),
     path('chats/<int:chat_id>/messages/',MessageListCreateView.as_view(),name='message-list-create'),
     path('messages/<int:pk>/',MessageDeleteView.as_view(),name='message-delete'),
-    path('group_cr',Group_cr.as_view()
-    )
-    
-
+    path('group_cr',Group_cr.as_view()),
+    path('groups/<int:group_id>/members/',GroupNumberListCreateView.as_view(),name='group-members'),
+    path('groups/<int:group_id>/members/me/',GroupNumberLeaveView.as_view(),name='group-leave'),
+    path('groups/<int:group_id>/members/<int:member_id>/',GroupNumberRoleUpdateView.as_view(),name='group-member-role'),
+    path
     
 ]
 
