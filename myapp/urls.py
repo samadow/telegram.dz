@@ -46,6 +46,7 @@ urlpatterns = [
     path('channels/<int:pk>/', ChanalDetailView.as_view()),
     path('channels/<int:channel_id>/posts/',PostListCreateView.as_view(),name='post-list-create'),
     path('posts/<int:pk>/',PostDetailView.as_view(),name='post-detail'),
+    path('groups/<int:pk>/', Group_detail.as_view(), name='group-detail'),
     
 ]
 
