@@ -77,3 +77,8 @@ class Group_number(models.Model):
 
         class Meta:
             constraints = [models.UniqueConstraint(fields=['user', 'group'],name='unique_user_group')]
+            
+            
+class Notifacations(models.Model):
+    text = models.CharField(max_length=50)
+    

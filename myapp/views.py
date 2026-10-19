@@ -4,16 +4,25 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
 # from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import RegisterSerializer,ProfileSerializer,AvatarSerialezer,ChatSerializer,MessageSerializer,GroupSerializer,GroupNumberRoleSerializer,GroupNumberSerializer,GroupMessageSerializer,ChanalSerializer
+from .serializers import RegisterSerializer,ProfileSerializer,AvatarSerialezer,ChatSerializer,MessageSerializer,GroupSerializer,GroupNumberRoleSerializer,GroupNumberSerializer,GroupMessageSerializer,ChanalSerializer,UserSearchSerializer,NotifacatinSerializer
 from rest_framework.generics import CreateAPIView,RetrieveAPIView,UpdateAPIView,ListAPIView,DestroyAPIView
 from .models import * 
 from rest_framework.exceptions import ValidationError,PermissionDenied
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAdminUser
 
+class ChanalListCreateView(generics.ListCreateAPIView):
+    serializer_class = ChanalSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        return Chanal.objects.filter(owner=self.request.user)
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+        
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
@@ -21,6 +30,10 @@ class RegisterView(generics.CreateAPIView):
 class Profil_viws(CreateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user_id=self.request.user)
    
 class Profil_detail(RetrieveAPIView):
     queryset = Profile.objects.all()
@@ -44,8 +57,6 @@ class Avatar_cr(CreateAPIView):
 class Avatar_delet(DestroyAPIView):
     queryset = Avatar.objects.all()
     serializer_class = AvatarSerialezer
-    
-    
 
 class ChatListCreateView(generics.ListCreateAPIView):
     serializer_class = ChatSerializer
@@ -53,7 +64,6 @@ class ChatListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-
         return Chat.objects.filter(
             Q(user_1=user) | Q(user_2=user)
         ).order_by('-id')
@@ -61,25 +71,9 @@ class ChatListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         user = self.request.user
         other_user = serializer.validated_data['user_2']
+        serializer.save(user_1=user)  
 
-        if user.id == other_user.id:
-            raise ValidationError(
-                {'user_2': 'Бо худат чат сохта намешавад.'}
-            )
-
-        chat_exists = Chat.objects.filter(
-            Q(user_1=user, user_2=other_user) |
-            Q(user_1=other_user, user_2=user)
-        ).exists()
-
-        if chat_exists:
-            raise ValidationError(
-                {'detail': 'Ин чат аллакай вуҷуд дорад.'}
-            )
-
-        serializer.save(user_1=user)
-
-
+        
 class ChatDetailDeleteView(generics.RetrieveDestroyAPIView):
     serializer_class = ChatSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -143,7 +137,7 @@ class Group_cr(CreateAPIView):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
-class Group_detail(ListAPIView):
+class Group_detail(RetrieveAPIView):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     
@@ -305,28 +299,6 @@ class GroupMessageDeleteView(generics.DestroyAPIView):
     
 
 
-class ChannelListCreateView(generics.ListCreateAPIView):
-    serializer_class = ChanalSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        user = self.request.user
-
-        return Chanal.objects.filter(
-            Q(type='public')
-            | Q(owner=user)
-            | Q(type='private', flowing__user_id=user)
-        ).distinct()
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
-
-
-class ChanalListCreateView(generics.ListCreateAPIView):
-    queryset = Chanal.objects.all()
-    serializer_class = ChanalSerializer
-
-
 class ChanalDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Chanal.objects.all()
     serializer_class = ChanalSerializer
@@ -337,20 +309,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from .models import Post, Chanal
 from .serializers import PostSerializer
-
-
-# GET ва POST — рӯйхати постҳо ва сохтани пост
-class PostListCreateView(generics.ListCreateAPIView):
+class PostCreateView(generics.CreateAPIView):
     serializer_class = PostSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return Post.objects.filter(
-            chanal_id_id=self.kwargs['channel_id']
-        ).order_by('-cr_at')
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        channel = Chanal.objects.get(
+        channel = get_object_or_404(
+            Chanal,
             id=self.kwargs['channel_id']
         )
 
@@ -360,8 +325,16 @@ class PostListCreateView(generics.ListCreateAPIView):
             )
 
         serializer.save(chanal_id=channel)
+        
+        
+class PostListView(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-
+    def get_queryset(self):
+        return Post.objects.filter(
+            chanal_id_id=self.kwargs['channel_id']
+        ).order_by('-cr_at')
 # GET, PATCH ва DELETE — як пост
 class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
@@ -386,13 +359,24 @@ class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
 
         instance.delete()
         
+
+
+class UserSearchView(ListAPIView):
+    serializer_class = UserSearchSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        username = self.request.query_params.get("search", "")
+        return Acounts.objects.filter(
+            username__icontains=username
+        )
         
- 
- 
- 
- 
- 
-         
-# kjvnrwngwiojgwsopjvsweogjpjrg
-# kjvnrwngwiojgwsopjvsweogjpjrg
-# kjvnrwngwiojgwsopjvsweogjpjrg
+class Notifications_cr(CreateAPIView):
+    queryset = Notifacations.objects.all()
+    serializer_class =NotifacatinSerializer
+    permission_classes = [IsAdminUser]
+    
+class Notifacationslist(ListAPIView):
+    queryset = Notifacations.objects.all()
+    serializer_class = NotifacatinSerializer
+    permission_classes = [IsAuthenticated]

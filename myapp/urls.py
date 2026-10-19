@@ -9,10 +9,11 @@ from .views import (RegisterView,Profil_viws,
                     GroupNumberRoleUpdateView,
                     GroupNumberLeaveView,
                     GroupMessageListCreateView,
-                    GroupMessageDeleteView,
+                    GroupMessageDeleteView,PostListView,
                     ChanalListCreateView,ChanalDetailView,
-                    PostListCreateView,PostDetailView,
-                    Group_delet,Group_update,Group_detail
+                    PostCreateView,PostDetailView,
+                    Group_delet,Group_update,Group_detail,
+                    UserSearchView,Notifications_cr,Notifacationslist
                     )
 
 
@@ -28,7 +29,7 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path("profilecreat",Profil_viws.as_view()),
     path("profilupdate/<int:pk>/",Profil_update.as_view()),
-    path("prfildetail",Profil_detail.as_view()),
+    path('prfildetail/<int:pk>/', Profil_detail.as_view()),
     path('profiles/', ProfileSearchView.as_view()),
     path("avatar_cr",Avatar_cr.as_view()),
     path("avatar_delet",Avatar_delet.as_view()),
@@ -44,12 +45,17 @@ urlpatterns = [
     path('group-messages/<int:pk>/',GroupMessageDeleteView.as_view(),name='group-message-delete'),
     path('channels/', ChanalListCreateView.as_view()),
     path('channels/<int:pk>/', ChanalDetailView.as_view()),
-    path('channels/<int:channel_id>/posts/',PostListCreateView.as_view(),name='post-list-create'),
+    # path('channels/<int:channel_id>/posts/',PostListCreateView.as_view(),name='post-list-create'),
     path('posts/<int:pk>/',PostDetailView.as_view(),name='post-detail'),
     path('groups/<int:pk>/', Group_detail.as_view(), name='group-detail'),
     path('groups/<int:pk>/update/', Group_update.as_view(), name='group-update'),
     path('groups/<int:pk>/delete/', Group_delet.as_view(), name='group-delete'),
-    
+    # path("postscreat/",Post_cr.as_view())
+    path('postslist/',PostListView.as_view(),name='post-list'),
+    path('channels/<int:channel_id>/posts/create/',PostCreateView.as_view(),name='post-create'),
+    path("users/search/", UserSearchView.as_view(), name="user-search"),
+    path("notificationscreat",Notifications_cr.as_view()),
+    path("notifacationslis",Notifacationslist.as_view()),
 ]
 
 

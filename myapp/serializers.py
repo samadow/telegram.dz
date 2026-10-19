@@ -1,7 +1,10 @@
 from rest_framework import serializers
-from .models import Acounts,Profile,Post,Chanal,Group,Group_message,Group_number,Chat,Message,Flowing,Avatar
+from .models import Acounts,Profile,Post,Chanal,Group,Group_message,Group_number,Chat,Message,Notifacations,Avatar
 from rest_framework import serializers
 
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 
@@ -46,8 +49,9 @@ class MessageSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'sender', 'chat_id', 'cr_at']
         
 class GroupSerializer(serializers.ModelSerializer):
-    model = Group
-    fields = "__all__"
+    class Meta:
+        model = Group
+        fields = "__all__"
     
 class GroupNumberSerializer(serializers.ModelSerializer):
     class Meta:
@@ -83,9 +87,23 @@ class ChanalSerializer(serializers.ModelSerializer):
         fields = ['id','owner','title','description','type','cr_at','link',]
         read_only_fields = ['id', 'owner', 'cr_at']
         
-        
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = '__all__'
         read_only_fields = ['chanal_id', 'cr_at']
+        
+        
+
+
+
+
+class UserSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username"]
+        
+class NotifacatinSerializer(serializers.ModelSerializer):
+    model = Notifacations
+    fields = "__all__"
+
