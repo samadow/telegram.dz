@@ -387,10 +387,12 @@ class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
         instance.delete()
         
         
-        
+ 
+ 
+ 
+ 
+ 
+         
 # kjvnrwngwiojgwsopjvsweogjpjrg
 # kjvnrwngwiojgwsopjvsweogjpjrg
-# kjvnrwngwiojgwsopjvsweogjpjrg        
 # kjvnrwngwiojgwsopjvsweogjpjrg
-# kjvnrwngwiojgwsopjvsweogjpjrg
-# kjvnrwngwiojgwsopjvsweogjpjrg        
