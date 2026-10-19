@@ -8,6 +8,8 @@ from .views import (RegisterView,Profil_viws,
                     GroupNumberListCreateView,
                     GroupNumberRoleUpdateView,
                     GroupNumberLeaveView,
+                    GroupMessageListCreateView,
+                    GroupMessageDeleteView,
                     Group_delet,Group_update,Group_detail
                     )
 
@@ -36,7 +38,16 @@ urlpatterns = [
     path('groups/<int:group_id>/members/',GroupNumberListCreateView.as_view(),name='group-members'),
     path('groups/<int:group_id>/members/me/',GroupNumberLeaveView.as_view(),name='group-leave'),
     path('groups/<int:group_id>/members/<int:member_id>/',GroupNumberRoleUpdateView.as_view(),name='group-member-role'),
-    path
+    path(
+    'groups/<int:group_id>/messages/',
+    GroupMessageListCreateView.as_view(),
+    name='group-message-list-create'
+),
+path(
+    'group-messages/<int:pk>/',
+    GroupMessageDeleteView.as_view(),
+    name='group-message-delete'
+),
     
 ]
 
