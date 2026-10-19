@@ -11,7 +11,7 @@ from .views import (RegisterView,Profil_viws,
                     GroupMessageListCreateView,
                     GroupMessageDeleteView,
                     ChanalListCreateView,ChanalDetailView,
-                    PostListCreateView,
+                    PostListCreateView,PostDetailView,
                     Group_delet,Group_update,Group_detail
                     )
 
